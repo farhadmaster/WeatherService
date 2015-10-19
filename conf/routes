@@ -1,0 +1,25 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Home page
+#Either set routesGenerator := InjectedRoutesGenerator The code samples in Play’s documentation assumes that you are using the injected routes generator.
+# If you are not using this, you can trivially adapt the code samples for the static routes generator, 
+#either by prefixing the controller invocation part of the route with an @ symbol, or by declaring each of your action methods as static.
+
+GET     /                           @controllers.WeatherRestAPI.index()
+
+# Map static resources from the /public folder to the /assets URL path
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)
+
+GET 	/getAllWeather				controllers.WeatherRestAPI.getAllWeather()
+GET 	/serachwether/				controllers.WeatherRestAPI.getWeatherByLocationAndDate()
+GET 	/getWeatherById/:id			controllers.WeatherRestAPI.getWeatherById(id: String)
+
+
+#GET	/weather/all				controllers.Application.list()
+#GET 	/weather/:id 				controllers.Application.show(id: String)
+
+
+
+

@@ -3,9 +3,11 @@ package services;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Singleton;
+
 public interface WeatherService {
 
-	public  void indexNextFile();
+	public  boolean indexNextFile();
 
 	public  Map<String, Object> loadWeatherById(String id);
 

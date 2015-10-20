@@ -2,6 +2,7 @@ package data;
 
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -10,23 +11,31 @@ import javax.inject.Singleton;
 
 import model.FileModel;
 
+import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.action.ListenableActionFuture;
 import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
 import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
 import org.elasticsearch.action.admin.indices.exists.types.TypesExistsResponse;
+import org.elasticsearch.common.xcontent.XContentBuilder;
+import org.elasticsearch.common.xcontent.XContentFactory;
 import org.elasticsearch.action.get.GetResponse;
 import org.elasticsearch.action.index.IndexRequest;
 import org.elasticsearch.action.index.IndexResponse;
 import org.elasticsearch.action.search.SearchResponse;
 import org.elasticsearch.action.search.SearchType;
+import org.elasticsearch.action.update.UpdateRequest;
+import org.elasticsearch.action.update.UpdateRequestBuilder;
+import org.elasticsearch.action.update.UpdateResponse;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.common.settings.ImmutableSettings;
 import org.elasticsearch.common.settings.Settings;
 import org.elasticsearch.index.query.BoolQueryBuilder;
 import org.elasticsearch.index.query.QueryBuilder;
 import org.elasticsearch.index.query.QueryBuilders;
+import org.elasticsearch.script.ScriptService.ScriptType;
 import org.elasticsearch.search.SearchHit;
 import org.elasticsearch.search.aggregations.AggregationBuilders;
+import org.elasticsearch.search.aggregations.metrics.min.Min;
 
 import services.ElasticSeachConnection;
 import util.HashUtil;
@@ -117,7 +126,28 @@ public class WeatherDataHandlerImpl implements WeatherDataHandler {
 	 * @see Data.WeatherDataHandler#changeFileStatus(java.lang.String)
 	 */
 	@Override
-	public void changeFileStatus(String id) {
+	public void changeFileStatus(String filename) {
+		Client client = connection.getInstance();
+		 
+
+//		 client.prepareUpdate(INDEX, TYPE_FILE, filename)
+//        .setScript("ctx._source.fileReaded = " + true  , ScriptType.INLINE)
+//        .get();
+		
+		   UpdateRequestBuilder br = client.prepareUpdate(INDEX, TYPE_FILE, filename);
+		    br.setDoc("{\"fileReaded\":" + true +"}");
+		    br.execute();
+		    
+		
+		    
+//		try {
+//			client.prepareUpdate(INDEX, TYPE_FILE, filename).setScript("ctx._source.fileReaded += fileReaded", ScriptType.INLINE ).addScriptParam("fileReaded", false).execute().actionGet();
+//		} catch (ElasticsearchException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+		
+		
 	}
 
 	@Override
@@ -137,7 +167,7 @@ public class WeatherDataHandlerImpl implements WeatherDataHandler {
 	@Override
 	public boolean isFileListInitialized() {
 		Client client = connection.getInstance();
-		TypesExistsResponse response = client.admin().indices().prepareTypesExists(TYPE_FILE).setTypes(TYPE_FILE).execute().actionGet();
+		TypesExistsResponse response = client.admin().indices().prepareTypesExists(INDEX).setTypes(TYPE_FILE).execute().actionGet();
 		if(response.isExists()){
 			return true;
 		}else{
@@ -146,15 +176,22 @@ public class WeatherDataHandlerImpl implements WeatherDataHandler {
 	}
 
 	@Override
-	public void getNextFileName() {
+	public String getNextFileName() {
 		Client client = connection.getInstance();
 		BoolQueryBuilder boolQuery = new BoolQueryBuilder();
-		QueryBuilder queryBuilder1 = QueryBuilders.matchQuery("fileReaded",false).;
-		boolQuery.must(queryBuilder1);
-		SearchResponse result = client.prepareSearch(INDEX).setTypes(TYPE_WEATHER).setQuery(boolQuery).addAggregation(AggregationBuilders.max("maxFilename").field("filename")).execute().actionGet();
-		//result.getAggregations().get("maxFilename")
+		QueryBuilder queryBuilder1 = QueryBuilders.matchQuery("fileReaded",false);
+		SearchResponse result1 = client.prepareSearch(INDEX).setTypes(TYPE_FILE).setQuery(queryBuilder1).setSize(0).addAggregation(AggregationBuilders.min("minorderId").field("orderId")).execute().actionGet();
+		int min = (int)((Min)result1.getAggregations().get("minorderId")).getValue();
 		
+		QueryBuilder queryBuilder2 = QueryBuilders.matchQuery("orderId",min);
+		SearchResponse result2 = client.prepareSearch(INDEX).setTypes(TYPE_FILE).setQuery(queryBuilder2).execute().actionGet();
 		
-		
+		if(result2.getHits().totalHits()>0)	{	
+		return result2.getHits().getAt(0).getSource().get("filename").toString();
+		}
+		return null;
 	}
+	
+	
+	
 }

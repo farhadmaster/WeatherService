@@ -4,15 +4,19 @@ import java.util.TimerTask;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import services.WeatherService;
+
 
 @Singleton
 public class IndexingFileService extends TimerTask{
-	@Inject WeatherService weatherservice;
+	@Inject  WeatherService weatherservice;
 	
-	@Override
+	@Override 
 	public void run() {
-		
-		weatherservice.indexNextFile(); //indexnextfile
+		boolean status = weatherservice.indexNextFile(); //indexnextfile
+		if (status == false){
+			this.cancel();
+		}
 	}
 
 }

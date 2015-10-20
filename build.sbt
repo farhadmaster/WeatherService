@@ -13,7 +13,6 @@ libraryDependencies ++= Seq(
   "javax.inject" % "javax.inject" % "1",
   javaJpa,
   "org.hibernate" % "hibernate-entitymanager" % "4.3.9.Final"
- 
 )
 
 
@@ -29,6 +28,7 @@ libraryDependencies += "junit" % "junit" % "4.11"
 libraryDependencies += "org.avaje" % "ebean" % "2.7.3"
 libraryDependencies += "javax.persistence" % "persistence-api" % "1.0.2"
 libraryDependencies += "org.apache.commons" % "commons-io" % "1.3.2"
+//libraryDependencies += "com.typesafe.akka" % "akka-actor_2.11" % "2.4.0"
 
 
 

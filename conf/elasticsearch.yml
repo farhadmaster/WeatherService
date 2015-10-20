@@ -1,0 +1,4 @@
+script.engine.groovy.inline.update: on
+indices.cache.filter.size: 50%
+indices.fielddata.cache.size: 50%
+bootstrap.mlockall: true

@@ -3,9 +3,10 @@ package data;
 import java.util.List;
 import java.util.Map;
 
+import com.google.inject.Singleton;
+
 import model.FileModel;
 
-import org.elasticsearch.common.xcontent.XContentBuilder;
 
 public interface WeatherDataHandler {
 
@@ -23,6 +24,6 @@ public interface WeatherDataHandler {
 
 	public boolean isFileListInitialized();
 
-	public void getNextFileName();
+	public String getNextFileName();
 
 }

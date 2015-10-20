@@ -1,17 +1,19 @@
 package services;
 
-import javax.inject.Singleton;
 
 import org.elasticsearch.ElasticsearchException;
 import org.elasticsearch.client.Client;
 import org.elasticsearch.client.transport.TransportClient;
 import org.elasticsearch.common.transport.InetSocketTransportAddress;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
 
 
 @Singleton
 public class ElasticSeachConnection {
 	private Client client;
-
+	
+	@Inject
 	private ElasticSeachConnection(){
 		initializeInstance();
 	}

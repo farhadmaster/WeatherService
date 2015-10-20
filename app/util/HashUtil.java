@@ -2,7 +2,8 @@ package util;
 
 import java.util.Base64;
 
-import javax.inject.Singleton;
+import com.google.inject.Singleton;
+
 
 @Singleton
 public class HashUtil {

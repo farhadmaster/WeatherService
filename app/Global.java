@@ -1,9 +1,6 @@
 import java.util.Timer;
-import java.util.TimerTask;
 
 import javax.inject.Inject;
-
-import com.google.inject.Guice;
 
 import play.Application;
 import play.GlobalSettings;
@@ -17,13 +14,16 @@ public class Global extends GlobalSettings {
 	@Inject static ElasticSeachConnection connectionFactory;
 	@Inject static IndexingFileService indexingFileService;
 	
+	
 	public void onStart(Application app) {
 		Logger.info("Application has started");
+		
 		weatherservice.initializeIndex();
 		weatherservice.initializeFileList();
-		new Timer().schedule(indexingFileService, 1000);
+		new Timer().schedule(indexingFileService, 0,1000);
+		
 	}
-
+	
 	public void onStop(Application app) {
 		Logger.info("Application shutdown...");
 		connectionFactory.destroy();

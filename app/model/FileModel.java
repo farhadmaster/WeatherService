@@ -1,7 +1,8 @@
 package model;
 
-import javax.inject.Inject;
-import javax.inject.Singleton;
+import com.google.inject.Inject;
+import com.google.inject.Singleton;
+
 
 @Singleton
 public class FileModel {
@@ -10,6 +11,7 @@ public class FileModel {
 	private String fileSeq ;
 	private String filename;
 	private Boolean fileReaded;
+	private int orderId;
 	
 	@Inject
 	public FileModel (){
@@ -39,6 +41,14 @@ public class FileModel {
 	}
 	public void setFileReaded(Boolean fileReaded) {
 		this.fileReaded = fileReaded;
+	}
+
+	public int getOrderId() {
+		return orderId;
+	}
+
+	public void setOrderId(int orderId) {
+		this.orderId = orderId;
 	}
 	
 	

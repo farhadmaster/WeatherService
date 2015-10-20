@@ -1,5 +1,6 @@
 package services;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -7,15 +8,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 
 import model.FileModel;
-
-import org.elasticsearch.action.ListenableActionFuture;
-import org.elasticsearch.action.admin.indices.create.CreateIndexRequest;
-import org.elasticsearch.action.admin.indices.exists.indices.IndicesExistsResponse;
-import org.elasticsearch.client.Client;
-import org.elasticsearch.common.settings.ImmutableSettings;
-import org.elasticsearch.common.settings.Settings;
-import org.elasticsearch.common.xcontent.XContentBuilder;
-
 import util.WeatherFTPReader;
 import data.WeatherDataHandler;
 
@@ -26,24 +18,29 @@ public class WeatherServiceImpl implements WeatherService {
 	@Inject  FileModel filemodel;
 	@Inject  ElasticSeachConnection connectionFactory;
 
-	final String index = "weather";
-	private static final String type = "filelist";
-
 	/* (non-Javadoc)
 	 * @see services.WeatherService#initializeRecordIndex()
 	 */
 	@Override
-	public void indexNextFile(){
-			List<Map<String, String>> records = weatherFtpReader.readCSVFileToMap(getNextFileName());
+	public boolean indexNextFile(){
+		String filename = getNextFileName();
+		if(filename.equals("weeronl20150903M34_999257.csv.bz2")){
+		
+		if(filename != null){
+			List<Map<String, String>> records = weatherFtpReader.readCSVFileToMap(filename);
+			
 			if(records != null){
 				weatherDataHandeling.saveWeatherRecord(records);
 				weatherDataHandeling.changeFileStatus(filename);
+				
 			}
+			return true;
+		}}
+		return false;
 	}
 
 	private String getNextFileName() {
-		weatherDataHandeling.getNextFileName();
-		return null;
+		return weatherDataHandeling.getNextFileName();
 	}
 
 	/* (non-Javadoc)
@@ -70,6 +67,7 @@ public class WeatherServiceImpl implements WeatherService {
 		if(!isFileListInitialized()){
 			List<String> fileList = weatherFtpReader.listFileName();
 			FileModel file = null;
+			int orderId = 0;
 			for(String filename: fileList){
 				file = new FileModel();
 				String fileDate = filename.substring(7,15);
@@ -78,7 +76,9 @@ public class WeatherServiceImpl implements WeatherService {
 				file.setFilename(filename);
 				file.setFileReaded(false);
 				file.setFileSeq(fileSeq);
+				file.setOrderId(orderId);
 				weatherDataHandeling.saveFile(file,filename);
+				orderId++;
 			}
 		}
 	}
